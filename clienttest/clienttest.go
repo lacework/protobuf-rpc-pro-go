@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"os"
-	"protobufclient"
+	"github.com/spullara/protobuf-rpc-pro-go/protobufclient"
 	"time"
 )
 
 func main() {
-	client, err := protobufclient.Connect("localhost", 50862)
+	client, err := protobufclient.Connect("localhost", 53098)
 	checkError(err)
 
 	output := &protobufclient.Output{}
