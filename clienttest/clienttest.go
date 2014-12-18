@@ -19,7 +19,7 @@ func main() {
 
 	start := time.Now()
 	semaphore := make(chan int, 100)
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 4; i++ {
 		semaphore <- i
 	}
 	for i := 0; i < 100000; i++ {
@@ -32,7 +32,7 @@ func main() {
 		}()
 	}
 	fmt.Println(time.Now().Sub(start))
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 4; i++ {
 		<-semaphore
 	}
 	fmt.Println(time.Now().Sub(start))

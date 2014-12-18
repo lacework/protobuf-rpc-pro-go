@@ -1,6 +1,7 @@
 package protobufclient
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -25,13 +26,15 @@ func (m *Client) getNextId() int32 {
 
 func (m *Client) handleResponses(correlationId int32) {
 	messageBuffer := &bytes.Buffer{}
-	var readBuffer [512]byte
+	reader := bufio.NewReader(m.conn)
+	var readBuffer [1024]byte
 	for {
 		var readLength int
-		readLength, err := m.conn.Read(readBuffer[0:6])
+		readLength, err := reader.Read(readBuffer[0:6])
 		if err != nil {
 			return
 		}
+
 		messageLength, offset := proto.DecodeVarint(readBuffer[0:])
 		var toWrite int
 		if int(messageLength) < readLength-offset {
@@ -42,12 +45,13 @@ func (m *Client) handleResponses(correlationId int32) {
 		messageBuffer.Write(readBuffer[offset:toWrite])
 		for messageBuffer.Len() < int(messageLength) {
 			max := int(messageLength) - messageBuffer.Len()
-			readLength, err2 := m.conn.Read(readBuffer[0:max])
+			readLength, err2 := reader.Read(readBuffer[0:max])
 			if err2 != nil {
 				return
 			}
 			messageBuffer.Write(readBuffer[0:readLength])
 		}
+
 		wirepayload := &WirePayload{}
 		unmarshallerr := proto.Unmarshal(messageBuffer.Bytes(), wirepayload)
 		if unmarshallerr != nil {
