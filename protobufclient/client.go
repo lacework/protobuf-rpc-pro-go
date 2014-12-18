@@ -23,12 +23,12 @@ func (m *Client) getNextId() int32 {
 	return atomic.AddInt32(&m.currentId, 1)
 }
 
-func (m *Client) HandleConnectResponse(correlationId int32) {
+func (m *Client) handleResponses(correlationId int32) {
 	messageBuffer := &bytes.Buffer{}
 	var readBuffer [512]byte
 	for {
 		var readLength int
-		readLength, err := m.conn.Read(readBuffer[0:])
+		readLength, err := m.conn.Read(readBuffer[0:6])
 		if err != nil {
 			return
 		}
@@ -79,7 +79,7 @@ func Connect(host string, port int32) (*Client, error) {
 	client := &Client{currentId: 0, conn: conn, connected: connected}
 	client.mutex = &sync.Mutex{}
 	correlationId := client.getNextId()
-	go client.HandleConnectResponse(correlationId)
+	go client.handleResponses(correlationId)
 	var localHost string
 	var localPort int32
 	fmt.Sscanf(conn.LocalAddr().String(), "%s:%d", &localHost, &localPort)
