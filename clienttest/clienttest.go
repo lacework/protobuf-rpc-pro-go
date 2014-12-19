@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"github.com/spullara/protobuf-rpc-pro-go/protobufclient"
+	"github.com/lacework/protobuf-rpc-pro-go/protobufclient"
 	"time"
 )
 
